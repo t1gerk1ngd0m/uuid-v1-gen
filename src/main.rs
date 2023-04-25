@@ -1,7 +1,29 @@
 use mac_address::get_mac_address;
 use chrono::{Utc, DateTime};
+use clap::{Parser, Subcommand};
+
+#[derive(Parser, Debug)]
+struct AppArg {
+    #[clap(subcommand)]
+    action: Action,
+}
+
+#[derive(Subcommand, Debug)]
+enum Action {
+    V1
+}
 
 fn main() {
+    let cli = AppArg::parse();
+    let uuid = match cli.action {
+        Action::V1 => {
+            generate_v1()
+        }
+    };
+    println!("{}", uuid)
+}
+
+fn generate_v1() -> String {
     let diff_from_reference_vec = timestamp_to_vec(diff_from_reference());
     let clock_sequence = clock_sequence();
     let mac_address = mac_address_hex();
@@ -10,8 +32,7 @@ fn main() {
     elements.push(clock_sequence);
     elements.push(mac_address);
 
-    let uuid_v1 = elements.join("-");
-    println!("{:?}",uuid_v1)
+    elements.join("-")
 }
 
 fn diff_from_reference() -> String {
